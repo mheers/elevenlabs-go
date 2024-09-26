@@ -242,6 +242,51 @@ func (c *Client) TextToSpeechStream(streamWriter io.Writer, voiceID string, ttsR
 	return c.doRequest(c.ctx, streamWriter, http.MethodPost, fmt.Sprintf("%s/text-to-speech/%s/stream", c.baseURL, voiceID), bytes.NewBuffer(reqBody), contentTypeJSON, queries...)
 }
 
+// SpeechToSpeech converts a given speech audio to speech audio with a certain voice.
+//
+// It takes a string argument that represents the ID of the voice to be used for the speech to speech conversion,
+// a SpeechToSpeechRequest argument that contains the audio data to be used to generate the audio alongside other settings
+// and an optional list of QueryFunc 'queries' to modify the request.
+//
+// It returns a byte slice that contains mpeg encoded audio data in case of success, or an error.
+func (c *Client) SpeechToSpeech(voiceID string, stsReq SpeechToSpeechRequest, queries ...QueryFunc) ([]byte, error) {
+	var requestBody bytes.Buffer
+	multiPartWriter := multipart.NewWriter(&requestBody)
+
+	// Add the audio file as a part of the form
+	if stsReq.Audio == nil {
+		return nil, fmt.Errorf("audio file is required")
+	}
+	filePart, err := multiPartWriter.CreateFormFile("audio", "audio.mp3")
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(filePart, stsReq.Audio)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add the other fields as a JSON part of the form
+	jsonPart, err := multiPartWriter.CreateFormField("metadata")
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewEncoder(jsonPart).Encode(stsReq); err != nil {
+		return nil, err
+	}
+
+	// Important: close the writer to finalize the multipart body
+	multiPartWriter.Close()
+
+	contentType := multiPartWriter.FormDataContentType()
+	b := bytes.Buffer{}
+	err = c.doRequest(c.ctx, &b, http.MethodPost, fmt.Sprintf("%s/speech-to-speech/%s", c.baseURL, voiceID), &requestBody, contentType, queries...)
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
 // GetModels retrieves the list of all available models.
 //
 // It returns a slice of Model objects or an error.
