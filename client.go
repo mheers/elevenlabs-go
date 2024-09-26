@@ -310,7 +310,7 @@ func (c *Client) GetModels() ([]Model, error) {
 // It returns a slice of Voice objects or an error.
 func (c *Client) GetVoices() ([]Voice, error) {
 	b := bytes.Buffer{}
-	err := c.doRequest(c.ctx, &b, http.MethodGet, fmt.Sprintf("%s/voices", c.baseURL), &bytes.Buffer{}, contentTypeJSON)
+	err := c.doRequest(c.ctx, &b, http.MethodGet, fmt.Sprintf("%s/voices?show_legacy=true", c.baseURL), &bytes.Buffer{}, contentTypeJSON)
 	if err != nil {
 		return nil, err
 	}
