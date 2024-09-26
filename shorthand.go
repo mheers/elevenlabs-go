@@ -15,6 +15,11 @@ func TextToSpeechStream(streamWriter io.Writer, voiceID string, ttsReq TextToSpe
 	return getDefaultClient().TextToSpeechStream(streamWriter, voiceID, ttsReq, queries...)
 }
 
+// SpeechToSpeech calls the SpeechToSpeech method on the default client.
+func SpeechToSpeech(voiceID string, stsReq SpeechToSpeechRequest, queries ...QueryFunc) ([]byte, error) {
+	return getDefaultClient().SpeechToSpeech(voiceID, stsReq, queries...)
+}
+
 // GetModels calls the GetModels method on the default client.
 func GetModels() ([]Model, error) {
 	return getDefaultClient().GetModels()
@@ -103,4 +108,29 @@ func GetSubscription() (Subscription, error) {
 // GetUser calls the GetUser method on the default client.
 func GetUser() (User, error) {
 	return getDefaultClient().GetUser()
+}
+
+// VoiceIsolator calls the VoiceIsolator method on the default client.
+func VoiceIsolator(filePath string) ([]byte, error) {
+	return getDefaultClient().VoiceIsolator(filePath)
+}
+
+// CreateDubbingProject calls the CreateDubbingProject method on the default client.
+func CreateDubbingProject(dubReq CreateDubRequest) (CreateDubResponse, error) {
+	return getDefaultClient().CreateDubbingProject(dubReq)
+}
+
+// GetDubbingProjectMetadata calls the GetDubbingProjectMetadata method on the default client.
+func GetDubbingProjectMetadata(dubing_id string) (DubMetadata, error) {
+	return getDefaultClient().GetDubbingProjectMetadata(dubing_id)
+}
+
+// GetDubbingFile calls the GetDubbingFile method on the default client.
+func GetDubbingFile(dubing_id string, language_code string) ([]byte, error) {
+	return getDefaultClient().GetDubbingFile(dubing_id, language_code)
+}
+
+// DeleteDubbingProject calls the DeleteDubbingProject method on the default client.
+func DeleteDubbingProject(dubing_id string) error {
+	return getDefaultClient().DeleteDubbingProject(dubing_id)
 }
